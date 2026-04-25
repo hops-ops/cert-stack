@@ -1,7 +1,7 @@
 apiVersion: meta.dev.upbound.io/v2alpha1
 kind: Project
 metadata:
-  name: aws-certs-stack
+  name: aws-cert-stack
 spec:
   dependsOn:
   - apiVersion: pkg.crossplane.io/v1
@@ -27,7 +27,7 @@ spec:
   license: Apache-2.0
   maintainer: Patrick Lee Scott <pat@patscott.io>
   readme: |
-    # aws-certs-stack
+    # aws-cert-stack
 
     Single-claim install of cert-manager onto a target Kubernetes cluster,
     plus an opt-in AWS PodIdentity granting the cert-manager controller
@@ -42,5 +42,5 @@ spec:
     hosted zones, ClusterIssuer for Let's Encrypt DNS-01), use
     aws-external-dns-stack which embeds cert-manager when
     spec.certManager.enabled: true.
-  repository: ghcr.io/hops-ops/aws-certs-stack
-  source: github.com/hops-ops/aws-certs-stack
+  repository: ghcr.io/hops-ops/aws-cert-stack
+  source: github.com/hops-ops/aws-cert-stack

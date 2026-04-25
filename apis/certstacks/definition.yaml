@@ -1,12 +1,12 @@
 apiVersion: apiextensions.crossplane.io/v2
 kind: CompositeResourceDefinition
 metadata:
-  name: certsstacks.aws.hops.ops.com.ai
+  name: certstacks.aws.hops.ops.com.ai
 spec:
   group: aws.hops.ops.com.ai
   names:
-    kind: CertsStack
-    plural: certsstacks
+    kind: CertStack
+    plural: certstacks
   scope: Namespaced
   versions:
   - name: v1alpha1
@@ -14,11 +14,11 @@ spec:
     served: true
     schema:
       openAPIV3Schema:
-        description: CertsStack installs cert-manager onto a target Kubernetes cluster as a Helm release plus an AWS PodIdentity granting the cert-manager controller Route53 access (for DNS-01 ACME challenges).
+        description: CertStack installs cert-manager onto a target Kubernetes cluster as a Helm release plus an AWS PodIdentity granting the cert-manager controller Route53 access (for DNS-01 ACME challenges).
         type: object
         properties:
           spec:
-            description: CertsStackSpec defines the desired state.
+            description: CertStackSpec defines the desired state.
             type: object
             properties:
               clusterName:
@@ -113,7 +113,7 @@ spec:
             required:
             - clusterName
           status:
-            description: CertsStackStatus defines the observed state.
+            description: CertStackStatus defines the observed state.
             type: object
             properties:
               ready:

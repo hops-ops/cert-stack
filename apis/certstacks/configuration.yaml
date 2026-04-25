@@ -1,10 +1,10 @@
 apiVersion: meta.pkg.crossplane.io/v1alpha1
 kind: Configuration
 metadata:
-  name: aws-certs-stack
+  name: aws-cert-stack
   annotations:
     meta.crossplane.io/maintainer: Patrick Lee Scott
-    meta.crossplane.io/source: github.com/hops-ops/aws-certs-stack
+    meta.crossplane.io/source: github.com/hops-ops/aws-cert-stack
     meta.crossplane.io/description: Installs cert-manager onto a target Kubernetes cluster (Helm release + AWS PodIdentity for cert-manager's Route53 DNS-01 access).
 spec:
   dependsOn:

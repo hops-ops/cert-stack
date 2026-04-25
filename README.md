@@ -1,4 +1,4 @@
-# aws-certs-stack
+# aws-cert-stack
 
 Single-claim install of [cert-manager](https://github.com/cert-manager/cert-manager) onto a target Kubernetes cluster, plus an opt-in AWS PodIdentity granting the cert-manager controller Route53 access for DNS-01 ACME challenges.
 
@@ -8,7 +8,7 @@ For the full DNS+TLS bundle on AWS (also includes ExternalDNS, Route53 hosted zo
 
 ```yaml
 apiVersion: aws.hops.ops.com.ai/v1alpha1
-kind: CertsStack
+kind: CertStack
 metadata:
   name: certs
   namespace: default

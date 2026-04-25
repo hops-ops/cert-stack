@@ -1,10 +1,10 @@
 SHELL := /bin/bash
 
-PACKAGE ?= aws-certs-stack
-XRD_DIR := apis/certsstacks
+PACKAGE ?= aws-cert-stack
+XRD_DIR := apis/certstacks
 COMPOSITION := $(XRD_DIR)/composition.yaml
 DEFINITION := $(XRD_DIR)/definition.yaml
-EXAMPLE_DEFAULT := examples/certsstacks/standard.yaml
+EXAMPLE_DEFAULT := examples/certstacks/standard.yaml
 RENDER_TESTS := $(wildcard tests/test-*)
 E2E_TESTS := $(wildcard tests/e2etest-*)
 
@@ -16,8 +16,8 @@ build:
 	up project build
 
 EXAMPLES := \
-    examples/certsstacks/minimal.yaml:: \
-    examples/certsstacks/standard.yaml::
+    examples/certstacks/minimal.yaml:: \
+    examples/certstacks/standard.yaml::
 
 render\:all:
 	@tmpdir=$$(mktemp -d); \
@@ -86,11 +86,11 @@ render: ; @$(MAKE) 'render:all'
 validate: ; @$(MAKE) 'validate:all'
 
 render\:%:
-	@example="examples/certsstacks/$*.yaml"; \
+	@example="examples/certstacks/$*.yaml"; \
 	up composition render --xrd=$(DEFINITION) $(COMPOSITION) $$example
 
 validate\:%:
-	@example="examples/certsstacks/$*.yaml"; \
+	@example="examples/certstacks/$*.yaml"; \
 	up composition render --xrd=$(DEFINITION) $(COMPOSITION) $$example \
 		--include-full-xr --quiet | \
 		crossplane beta validate $(XRD_DIR) --error-on-missing-schemas -
