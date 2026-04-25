@@ -1,0 +1,43 @@
+# code: language=yaml
+#
+# Helm Release: cert-manager
+#
+# Installs cert-manager (CRDs + controller) on the target cluster.
+# Chart: https://charts.jetstack.io (chart name: cert-manager)
+# Upstream: https://github.com/cert-manager/cert-manager
+#
+
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: {{ $state.releaseName }}
+  annotations:
+    {{ setResourceNameAnnotation "cert-manager" }}
+  labels: {{ $state.labels | toJson }}
+spec:
+  managementPolicies: {{ $state.managementPolicies | toJson }}
+  forProvider:
+    chart:
+      name: cert-manager
+      repository: https://charts.jetstack.io
+      version: {{ $state.chartVersion | quote }}
+    namespace: {{ $state.namespace }}
+    {{- if gt (len $state.overrideAllValues) 0 }}
+    values:
+      {{- toYaml $state.overrideAllValues | nindent 6 }}
+    {{- else }}
+    values:
+      crds:
+        enabled: true
+      global:
+        leaderElection:
+          namespace: {{ $state.namespace }}
+      {{- if gt (len $state.values) 0 }}
+      {{- toYaml $state.values | nindent 6 }}
+      {{- end }}
+    {{- end }}
+  rollbackLimit: 3
+  providerConfigRef:
+    name: {{ $state.helmProviderConfigRef.name }}
+    kind: {{ $state.helmProviderConfigRef.kind }}

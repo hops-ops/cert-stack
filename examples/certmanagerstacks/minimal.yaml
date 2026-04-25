@@ -1,0 +1,7 @@
+apiVersion: hops.ops.com.ai/v1alpha1
+kind: CertManagerStack
+metadata:
+  name: cert-manager
+  namespace: default
+spec:
+  clusterName: my-cluster

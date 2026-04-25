@@ -1,0 +1,15 @@
+apiVersion: hops.ops.com.ai/v1alpha1
+kind: CertManagerStack
+metadata:
+  name: cert-manager
+  namespace: default
+spec:
+  clusterName: production-cluster
+  namespace: cert-manager
+  releaseName: cert-manager
+  chartVersion: v1.19.2
+  values:
+    prometheus:
+      enabled: true
+    webhook:
+      replicaCount: 2

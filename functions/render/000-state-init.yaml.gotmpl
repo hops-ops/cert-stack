@@ -1,0 +1,50 @@
+# code: language=yaml
+#
+# Initialize $state with spec defaults
+#
+
+{{- $xr := getCompositeResource . }}
+{{- $spec := $xr.spec | default dict }}
+{{- $metadata := $xr.metadata | default dict }}
+
+# ==============================================================================
+# Core defaults
+# ==============================================================================
+{{- $name := $metadata.name | default "cert-manager" }}
+{{- $clusterName := $spec.clusterName | default $name }}
+{{- $namespace := $spec.namespace | default "cert-manager" }}
+{{- $releaseName := $spec.releaseName | default "cert-manager" }}
+{{- $chartVersion := $spec.chartVersion | default "v1.19.2" }}
+{{- $managementPolicies := $spec.managementPolicies | default (list "*") }}
+
+# Labels
+{{- $defaultLabels := dict
+  "hops.ops.com.ai/managed" "true"
+  "hops.ops.com.ai/cert-manager" $name
+}}
+{{- $labels := merge $defaultLabels ($spec.labels | default dict) }}
+
+# Helm provider config (defaults to clusterName)
+{{- $helmProviderConfigRef := $spec.helmProviderConfigRef | default dict }}
+{{- $helmProviderConfigRef = dict
+  "name" ($helmProviderConfigRef.name | default $clusterName)
+  "kind" ($helmProviderConfigRef.kind | default "ProviderConfig")
+}}
+
+# ==============================================================================
+# Initialize $state
+# ==============================================================================
+{{- $state := dict
+  "name" $name
+  "clusterName" $clusterName
+  "namespace" $namespace
+  "releaseName" $releaseName
+  "chartVersion" $chartVersion
+  "managementPolicies" $managementPolicies
+  "labels" $labels
+  "helmProviderConfigRef" $helmProviderConfigRef
+  "values" ($spec.values | default dict)
+  "overrideAllValues" ($spec.overrideAllValues | default dict)
+  "observed" (dict)
+  "status" (dict)
+}}

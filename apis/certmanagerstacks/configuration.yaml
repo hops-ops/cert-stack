@@ -1,0 +1,14 @@
+apiVersion: meta.pkg.crossplane.io/v1alpha1
+kind: Configuration
+metadata:
+  name: cert-manager-stack
+  annotations:
+    meta.crossplane.io/maintainer: Patrick Lee Scott
+    meta.crossplane.io/source: github.com/hops-ops/cert-manager-stack
+    meta.crossplane.io/description: Installs cert-manager as a single Helm release on a target Kubernetes cluster. No AWS dependencies.
+spec:
+  dependsOn:
+  - function: xpkg.crossplane.io/crossplane-contrib/function-auto-ready
+    version: '>=v0.6.3'
+  - provider: xpkg.crossplane.io/crossplane-contrib/provider-helm
+    version: '>=v1'
