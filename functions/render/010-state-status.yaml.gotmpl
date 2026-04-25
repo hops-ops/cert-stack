@@ -6,7 +6,7 @@
 {{- $observed := $.observed.resources | default dict }}
 
 {{- $checkReady := dict }}
-{{- range $key := list "cert-manager" }}
+{{- range $key := list "cert-manager" "cm-pod-identity" }}
   {{- $entry := get $observed $key | default dict }}
   {{- $resource := $entry.resource | default dict }}
   {{- $status := $resource.status | default dict }}
@@ -21,6 +21,7 @@
 
 {{- $state = set $state "observed" (dict
   "certManager" (dict "ready" (get $checkReady "cert-manager"))
+  "podIdentity" (dict "ready" (get $checkReady "cm-pod-identity"))
 ) }}
 
 {{- $state = set $state "status" (dict

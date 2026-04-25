@@ -1,15 +1,15 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: certmanagerstacks.hops.ops.com.ai
+  name: certsstacks.aws.hops.ops.com.ai
 spec:
   compositeTypeRef:
-    apiVersion: hops.ops.com.ai/v1alpha1
-    kind: CertManagerStack
+    apiVersion: aws.hops.ops.com.ai/v1alpha1
+    kind: CertsStack
   mode: Pipeline
   pipeline:
   - functionRef:
-      name: hops-ops-cert-manager-stackrender
+      name: hops-ops-aws-certs-stackrender
     step: render
   - functionRef:
       name: crossplane-contrib-function-auto-ready

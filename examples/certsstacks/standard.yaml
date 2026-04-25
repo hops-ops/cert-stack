@@ -1,0 +1,21 @@
+apiVersion: aws.hops.ops.com.ai/v1alpha1
+kind: CertsStack
+metadata:
+  name: certs
+  namespace: default
+spec:
+  clusterName: production-cluster
+  region: us-west-2
+  rolePrefix: prod-
+  permissionsBoundaryArn: arn:aws:iam::123456789012:policy/boundary
+  tags:
+    environment: production
+  namespace: cert-manager
+  chartVersion: v1.19.2
+  route53:
+    enabled: true
+  values:
+    prometheus:
+      enabled: true
+    webhook:
+      replicaCount: 2

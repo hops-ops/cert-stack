@@ -1,0 +1,18 @@
+apiVersion: meta.pkg.crossplane.io/v1alpha1
+kind: Configuration
+metadata:
+  name: aws-certs-stack
+  annotations:
+    meta.crossplane.io/maintainer: Patrick Lee Scott
+    meta.crossplane.io/source: github.com/hops-ops/aws-certs-stack
+    meta.crossplane.io/description: Installs cert-manager onto a target Kubernetes cluster (Helm release + AWS PodIdentity for cert-manager's Route53 DNS-01 access).
+spec:
+  dependsOn:
+  - function: xpkg.crossplane.io/crossplane-contrib/function-auto-ready
+    version: '>=v0.6.3'
+  - provider: xpkg.crossplane.io/crossplane-contrib/provider-helm
+    version: '>=v1'
+  - provider: xpkg.crossplane.io/crossplane-contrib/provider-kubernetes
+    version: '>=v1'
+  - configuration: ghcr.io/hops-ops/aws-pod-identity
+    version: '>=v0.10.0'

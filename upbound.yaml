@@ -1,7 +1,7 @@
 apiVersion: meta.dev.upbound.io/v2alpha1
 kind: Project
 metadata:
-  name: cert-manager-stack
+  name: aws-certs-stack
 spec:
   dependsOn:
   - apiVersion: pkg.crossplane.io/v1
@@ -12,20 +12,35 @@ spec:
     kind: Provider
     package: xpkg.crossplane.io/crossplane-contrib/provider-helm
     version: '>=v1'
-  description: Installs cert-manager as a single Helm release on a target Kubernetes
-    cluster. No AWS dependencies. For DNS-01 / Route53 ClusterIssuers, use the aws-external-dns-stack
-    instead (or in addition).
+  - apiVersion: pkg.crossplane.io/v1
+    kind: Provider
+    package: xpkg.crossplane.io/crossplane-contrib/provider-kubernetes
+    version: '>=v1'
+  - apiVersion: pkg.crossplane.io/v1
+    kind: Configuration
+    package: ghcr.io/hops-ops/aws-pod-identity
+    version: '>=v0.10.0'
+  description: Installs cert-manager onto a target Kubernetes cluster (Helm release
+    + AWS PodIdentity for cert-manager's Route53 DNS-01 access). When spec.route53.enabled
+    is false, the PodIdentity is skipped — useful for clusters that only use HTTP-01
+    or self-signed Issuers.
   license: Apache-2.0
   maintainer: Patrick Lee Scott <pat@patscott.io>
   readme: |
-    # cert-manager-stack
+    # aws-certs-stack
 
-    Single-claim install of cert-manager onto a target Kubernetes cluster.
-    Composes one Helm release; no AWS dependencies.
+    Single-claim install of cert-manager onto a target Kubernetes cluster,
+    plus an opt-in AWS PodIdentity granting the cert-manager controller
+    Route53 access for DNS-01 ACME challenges.
 
-    Use this when you need cert-manager (CRDs + controller) but not Route53
-    DNS-01 ClusterIssuers or ExternalDNS. For the full DNS+TLS bundle on
-    AWS, use aws-external-dns-stack which embeds cert-manager when
-    `spec.certManager.enabled: true`.
-  repository: ghcr.io/hops-ops/cert-manager-stack
-  source: github.com/hops-ops/cert-manager-stack
+    Composes:
+    - cert-manager Helm release (always)
+    - PodIdentity binding the cert-manager ServiceAccount to a Route53 IAM
+      role (when spec.route53.enabled, default true)
+
+    For the full DNS+TLS bundle on AWS (also includes ExternalDNS, Route53
+    hosted zones, ClusterIssuer for Let's Encrypt DNS-01), use
+    aws-external-dns-stack which embeds cert-manager when
+    spec.certManager.enabled: true.
+  repository: ghcr.io/hops-ops/aws-certs-stack
+  source: github.com/hops-ops/aws-certs-stack

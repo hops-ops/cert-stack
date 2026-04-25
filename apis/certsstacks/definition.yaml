@@ -1,0 +1,123 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: certsstacks.aws.hops.ops.com.ai
+spec:
+  group: aws.hops.ops.com.ai
+  names:
+    kind: CertsStack
+    plural: certsstacks
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    referenceable: true
+    served: true
+    schema:
+      openAPIV3Schema:
+        description: CertsStack installs cert-manager onto a target Kubernetes cluster as a Helm release plus an AWS PodIdentity granting the cert-manager controller Route53 access (for DNS-01 ACME challenges).
+        type: object
+        properties:
+          spec:
+            description: CertsStackSpec defines the desired state.
+            type: object
+            properties:
+              clusterName:
+                description: Name of the target cluster. Used as default for helmProviderConfigRef.name and resource naming.
+                type: string
+              region:
+                description: AWS region for the PodIdentity / IAM resources. Defaults to us-east-1.
+                type: string
+              permissionsBoundaryArn:
+                description: IAM permissions boundary ARN applied to the cert-manager IAM role.
+                type: string
+              rolePrefix:
+                description: Prefix for the cert-manager IAM role name.
+                type: string
+              tags:
+                description: Additional AWS tags applied to the IAM resources.
+                type: object
+                additionalProperties:
+                  type: string
+                x-kubernetes-preserve-unknown-fields: true
+              managementPolicies:
+                description: Management policies for all composed resources. Defaults to ["*"].
+                type: array
+                items:
+                  type: string
+                default:
+                - "*"
+              labels:
+                description: Custom labels applied to all managed resources.
+                type: object
+                additionalProperties:
+                  type: string
+                x-kubernetes-preserve-unknown-fields: true
+              helmProviderConfigRef:
+                description: Reference to the Helm ProviderConfig. Defaults to clusterName.
+                type: object
+                properties:
+                  name:
+                    type: string
+                  kind:
+                    type: string
+                    enum:
+                    - ProviderConfig
+                    - ClusterProviderConfig
+              kubernetesProviderConfigRef:
+                description: Reference to the Kubernetes ProviderConfig (used by the PodIdentity to bind the Pod Identity Association on the target cluster). Defaults to clusterName.
+                type: object
+                properties:
+                  name:
+                    type: string
+                  kind:
+                    type: string
+                    enum:
+                    - ProviderConfig
+                    - ClusterProviderConfig
+              awsProviderConfigRef:
+                description: Reference to the AWS ProviderConfig (used by the PodIdentity to provision IAM Role + Pod Identity Association). Defaults to "default".
+                type: object
+                properties:
+                  name:
+                    type: string
+                  kind:
+                    type: string
+                    enum:
+                    - ProviderConfig
+                    - ClusterProviderConfig
+              namespace:
+                description: Namespace for the cert-manager Helm release. Defaults to "cert-manager".
+                type: string
+              releaseName:
+                description: Helm release name. Defaults to "cert-manager".
+                type: string
+              chartVersion:
+                description: cert-manager chart version. Defaults to v1.19.2.
+                type: string
+              values:
+                description: Helm values merged on top of chart defaults.
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              overrideAllValues:
+                description: Helm values that replace all defaults entirely.
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              route53:
+                description: Grant cert-manager Route53 access for DNS-01 ACME challenges. When enabled, composes an AWS PodIdentity that binds the cert-manager ServiceAccount to an IAM role with Route53 ChangeResourceRecordSets / ListHostedZonesByName / GetChange permissions. Disable for clusters that only use HTTP-01 or self-signed Issuers.
+                type: object
+                properties:
+                  enabled:
+                    description: Whether to compose the PodIdentity. Defaults to true.
+                    type: boolean
+                    default: true
+            required:
+            - clusterName
+          status:
+            description: CertsStackStatus defines the observed state.
+            type: object
+            properties:
+              ready:
+                description: Whether the cert-manager Helm release + PodIdentity are healthy.
+                type: boolean
+        required:
+        - spec

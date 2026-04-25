@@ -10,26 +10,58 @@
 # ==============================================================================
 # Core defaults
 # ==============================================================================
-{{- $name := $metadata.name | default "cert-manager" }}
+{{- $name := $metadata.name | default "certs" }}
 {{- $clusterName := $spec.clusterName | default $name }}
 {{- $namespace := $spec.namespace | default "cert-manager" }}
 {{- $releaseName := $spec.releaseName | default "cert-manager" }}
 {{- $chartVersion := $spec.chartVersion | default "v1.19.2" }}
 {{- $managementPolicies := $spec.managementPolicies | default (list "*") }}
+{{- $region := $spec.region | default "us-east-1" }}
 
 # Labels
+{{- $kindKey := printf "hops.ops.com.ai/%s" (lower $xr.kind) }}
 {{- $defaultLabels := dict
   "hops.ops.com.ai/managed" "true"
-  "hops.ops.com.ai/cert-manager" $name
+  $kindKey $name
 }}
-{{- $labels := merge $defaultLabels ($spec.labels | default dict) }}
+{{- $labels := mergeOverwrite (dict) $defaultLabels ($spec.labels | default dict) }}
 
-# Helm provider config (defaults to clusterName)
+# Tags (for AWS IAM resources composed via PodIdentity)
+{{- $defaultTags := dict
+  "hops.ops.com.ai/managed" "true"
+  $kindKey $name
+}}
+{{- $tags := mergeOverwrite (dict) $defaultTags ($spec.tags | default dict) }}
+
+# ==============================================================================
+# Provider config refs
+# ==============================================================================
 {{- $helmProviderConfigRef := $spec.helmProviderConfigRef | default dict }}
 {{- $helmProviderConfigRef = dict
   "name" ($helmProviderConfigRef.name | default $clusterName)
   "kind" ($helmProviderConfigRef.kind | default "ProviderConfig")
 }}
+
+{{- $kubernetesProviderConfigRef := $spec.kubernetesProviderConfigRef | default dict }}
+{{- $kubernetesProviderConfigRef = dict
+  "name" ($kubernetesProviderConfigRef.name | default $clusterName)
+  "kind" ($kubernetesProviderConfigRef.kind | default "ProviderConfig")
+}}
+
+{{- $awsProviderConfigRef := $spec.awsProviderConfigRef | default dict }}
+{{- $awsProviderConfigRef = dict
+  "name" ($awsProviderConfigRef.name | default "default")
+  "kind" ($awsProviderConfigRef.kind | default "ProviderConfig")
+}}
+
+# ==============================================================================
+# Route53 PodIdentity toggle
+# ==============================================================================
+{{- $route53Spec := $spec.route53 | default dict }}
+{{- $route53Enabled := true }}
+{{- if hasKey $route53Spec "enabled" }}
+  {{- $route53Enabled = $route53Spec.enabled }}
+{{- end }}
 
 # ==============================================================================
 # Initialize $state
@@ -42,9 +74,18 @@
   "chartVersion" $chartVersion
   "managementPolicies" $managementPolicies
   "labels" $labels
+  "region" $region
+  "tags" $tags
+  "permissionsBoundaryArn" ($spec.permissionsBoundaryArn | default "")
+  "rolePrefix" ($spec.rolePrefix | default "")
   "helmProviderConfigRef" $helmProviderConfigRef
+  "kubernetesProviderConfigRef" $kubernetesProviderConfigRef
+  "awsProviderConfigRef" $awsProviderConfigRef
   "values" ($spec.values | default dict)
   "overrideAllValues" ($spec.overrideAllValues | default dict)
+  "route53" (dict
+    "enabled" $route53Enabled
+  )
   "observed" (dict)
   "status" (dict)
 }}
