@@ -1,8 +1,7 @@
-apiVersion: aws.hops.ops.com.ai/v1alpha1
+apiVersion: hops.ops.com.ai/v1alpha1
 kind: CertStack
 metadata:
   name: certs
   namespace: default
 spec:
   clusterName: my-cluster
-  region: us-east-1

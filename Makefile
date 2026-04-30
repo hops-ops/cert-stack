@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-PACKAGE ?= aws-cert-stack
+PACKAGE ?= cert-stack
 XRD_DIR := apis/certstacks
 COMPOSITION := $(XRD_DIR)/composition.yaml
 DEFINITION := $(XRD_DIR)/definition.yaml

@@ -5,23 +5,18 @@
 
 {{- $observed := $.observed.resources | default dict }}
 
-{{- $checkReady := dict }}
-{{- range $key := list "cert-manager" "cm-pod-identity" }}
-  {{- $entry := get $observed $key | default dict }}
-  {{- $resource := $entry.resource | default dict }}
-  {{- $status := $resource.status | default dict }}
-  {{- $ready := false }}
-  {{- range ($status.conditions | default list) }}
-    {{- if and (eq .type "Ready") (eq .status "True") }}
-      {{- $ready = true }}
-    {{- end }}
+{{- $certManagerEntry := get $observed "cert-manager" | default dict }}
+{{- $certManagerResource := $certManagerEntry.resource | default dict }}
+{{- $certManagerStatus := $certManagerResource.status | default dict }}
+{{- $certManagerReady := false }}
+{{- range ($certManagerStatus.conditions | default list) }}
+  {{- if and (eq .type "Ready") (eq .status "True") }}
+    {{- $certManagerReady = true }}
   {{- end }}
-  {{- $checkReady = set $checkReady $key $ready }}
 {{- end }}
 
 {{- $state = set $state "observed" (dict
-  "certManager" (dict "ready" (get $checkReady "cert-manager"))
-  "podIdentity" (dict "ready" (get $checkReady "cm-pod-identity"))
+  "certManager" (dict "ready" $certManagerReady)
 ) }}
 
 {{- $state = set $state "status" (dict
