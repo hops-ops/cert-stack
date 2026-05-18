@@ -33,6 +33,33 @@ spec:
       global:
         leaderElection:
           namespace: {{ $state.namespace }}
+      # Burstable defaults: cert-manager controller, cainjector and webhook
+      # all ship as BestEffort by default and get OOM-evicted under node
+      # pressure. cainjector was observed at 163Mi on pat-local. Sized for
+      # a small-to-medium cluster; override via spec.values for big fleets.
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+      cainjector:
+        resources:
+          requests:
+            cpu: 25m
+            memory: 192Mi
+          limits:
+            cpu: 100m
+            memory: 384Mi
+      webhook:
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
       {{- if gt (len $state.values) 0 }}
       {{- toYaml $state.values | nindent 6 }}
       {{- end }}
