@@ -36,6 +36,11 @@ _items = [
                             version = "v1.19.2"
                         }
                         namespace = "cert-manager"
+                        values = {
+                            resources.requests = {cpu = "15m", memory = "100Mi"}
+                            cainjector.resources.requests = {cpu = "15m", memory = "194Mi"}
+                            webhook.resources.requests = {cpu = "15m", memory = "100Mi"}
+                        }
                     }
                 }
             ]
