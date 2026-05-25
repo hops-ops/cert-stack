@@ -7,6 +7,24 @@
 # Upstream: https://github.com/cert-manager/cert-manager
 #
 
+{{- $chartDefaults := dict
+  "crds" (dict "enabled" true)
+  "global" (dict "leaderElection" (dict "namespace" $state.namespace))
+  "resources" (dict
+    "requests" (dict "cpu" "15m" "memory" "100Mi")
+    "limits" (dict "cpu" "200m" "memory" "256Mi")
+  )
+  "cainjector" (dict "resources" (dict
+    "requests" (dict "cpu" "15m" "memory" "194Mi")
+    "limits" (dict "cpu" "100m" "memory" "512Mi")
+  ))
+  "webhook" (dict "resources" (dict
+    "requests" (dict "cpu" "15m" "memory" "100Mi")
+    "limits" (dict "cpu" "100m" "memory" "256Mi")
+  ))
+}}
+{{- $mergedValues := mergeOverwrite $chartDefaults ($state.values | default dict) }}
+
 ---
 apiVersion: helm.m.crossplane.io/v1beta1
 kind: Release
@@ -28,41 +46,7 @@ spec:
       {{- toYaml $state.overrideAllValues | nindent 6 }}
     {{- else }}
     values:
-      crds:
-        enabled: true
-      global:
-        leaderElection:
-          namespace: {{ $state.namespace }}
-      # Burstable defaults: cert-manager controller, cainjector and webhook
-      # all ship as BestEffort by default and get OOM-evicted under node
-      # pressure. cainjector was observed at 163Mi on pat-local. Sized for
-      # a small-to-medium cluster; override via spec.values for big fleets.
-      resources:
-        requests:
-          cpu: 50m
-          memory: 128Mi
-        limits:
-          cpu: 200m
-          memory: 256Mi
-      cainjector:
-        resources:
-          requests:
-            cpu: 25m
-            memory: 192Mi
-          limits:
-            cpu: 100m
-            memory: 384Mi
-      webhook:
-        resources:
-          requests:
-            cpu: 25m
-            memory: 64Mi
-          limits:
-            cpu: 100m
-            memory: 128Mi
-      {{- if gt (len $state.values) 0 }}
-      {{- toYaml $state.values | nindent 6 }}
-      {{- end }}
+      {{- toYaml $mergedValues | nindent 6 }}
     {{- end }}
   rollbackLimit: 3
   providerConfigRef:
