@@ -14,6 +14,7 @@
 {{- $clusterName := $spec.clusterName | default $name }}
 {{- $namespace := $spec.namespace | default "cert-manager" }}
 {{- $releaseName := $spec.releaseName | default "cert-manager" }}
+# renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
 {{- $chartVersion := $spec.chartVersion | default "v1.19.2" }}
 {{- $managementPolicies := $spec.managementPolicies | default (list "*") }}
 
