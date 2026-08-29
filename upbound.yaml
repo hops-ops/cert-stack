@@ -7,11 +7,11 @@ spec:
   - apiVersion: pkg.crossplane.io/v1
     kind: Function
     package: xpkg.crossplane.io/crossplane-contrib/function-auto-ready
-    version: '>=v0 <v1'
+    version: '^v0'
   - apiVersion: pkg.crossplane.io/v1
     kind: Provider
     package: xpkg.crossplane.io/crossplane-contrib/provider-helm
-    version: '>=v1 <v2'
+    version: '^v1'
   description: Installs cert-manager onto a target Kubernetes cluster as a Helm release.
     Cloud-neutral — DNS-01 plumbing (Route53 PodIdentity, Cloudflare API token) lives
     in the corresponding DNS stack (aws-dnsstack, cloudflare-dnsstack).
