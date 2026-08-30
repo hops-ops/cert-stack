@@ -15,7 +15,7 @@
 {{- $namespace := $spec.namespace | default "cert-manager" }}
 {{- $releaseName := $spec.releaseName | default "cert-manager" }}
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
-{{- $chartVersion := $spec.chartVersion | default "v1.19.2" }}
+{{- $chartVersion := $spec.chartVersion | default "v1.21.1" }}
 {{- $managementPolicies := $spec.managementPolicies | default (list "*") }}
 
 # Labels
