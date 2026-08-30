@@ -34,7 +34,7 @@ _items = [
                             name = "cert-manager"
                             repository = "https://charts.jetstack.io"
                             # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
-                            version = "v1.19.2"
+                            version = "v1.21.1"
                         }
                         namespace = "cert-manager"
                         values = {
