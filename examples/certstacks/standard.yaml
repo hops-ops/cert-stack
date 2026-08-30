@@ -6,6 +6,7 @@ metadata:
 spec:
   clusterName: production-cluster
   namespace: cert-manager
+  # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
   chartVersion: v1.19.2
   values:
     prometheus:

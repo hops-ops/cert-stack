@@ -46,8 +46,8 @@ This composes:
 
 | Kind | Package | Version |
 |---|---|---|
-| Function | `crossplane-contrib/function-auto-ready` | `>=v0.6.3` |
-| Provider | `crossplane-contrib/provider-helm` | `>=v1` |
+| Function | `crossplane-contrib/function-auto-ready` | `^v0` |
+| Provider | `crossplane-contrib/provider-helm` | `^v1` |
 
 ## Development
 
