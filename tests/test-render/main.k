@@ -220,28 +220,42 @@ _items = [
             }
             assertResources = [
                 {
+                    apiVersion = "helm.m.crossplane.io/v1beta1"
+                    kind = "Release"
+                    metadata.name = "cert-manager"
+                    spec.forProvider.values.extraArgs = [
+                        "--cluster-resource-namespace=cert-manager"
+                    ]
+                }
+                {
                     apiVersion = "kubernetes.m.crossplane.io/v1alpha1"
                     kind = "Object"
                     metadata.name = "certs-internal-ca-bootstrap"
-                    spec.forProvider.manifest = {
-                        apiVersion = "cert-manager.io/v1"
-                        kind = "ClusterIssuer"
-                        metadata.name = "internal-ca-bootstrap"
+                    spec = {
+                        readiness = {policy = "DeriveFromObject"}
+                        forProvider.manifest = {
+                            apiVersion = "cert-manager.io/v1"
+                            kind = "ClusterIssuer"
+                            metadata.name = "internal-ca-bootstrap"
+                        }
                     }
                 }
                 {
                     apiVersion = "kubernetes.m.crossplane.io/v1alpha1"
                     kind = "Object"
                     metadata.name = "certs-internal-ca-cert"
-                    spec.forProvider.manifest = {
-                        apiVersion = "cert-manager.io/v1"
-                        kind = "Certificate"
-                        spec = {
-                            isCA = True
-                            secretName = "internal-ca"
-                            issuerRef = {
-                                name = "internal-ca-bootstrap"
-                                kind = "ClusterIssuer"
+                    spec = {
+                        readiness = {policy = "DeriveFromObject"}
+                        forProvider.manifest = {
+                            apiVersion = "cert-manager.io/v1"
+                            kind = "Certificate"
+                            spec = {
+                                isCA = True
+                                secretName = "internal-ca"
+                                issuerRef = {
+                                    name = "internal-ca-bootstrap"
+                                    kind = "ClusterIssuer"
+                                }
                             }
                         }
                     }
@@ -250,12 +264,15 @@ _items = [
                     apiVersion = "kubernetes.m.crossplane.io/v1alpha1"
                     kind = "Object"
                     metadata.name = "certs-internal-ca-issuer"
-                    spec.forProvider.manifest = {
-                        apiVersion = "cert-manager.io/v1"
-                        kind = "ClusterIssuer"
-                        metadata.name = "internal-ca"
-                        spec = {
-                            ca = {secretName = "internal-ca"}
+                    spec = {
+                        readiness = {policy = "DeriveFromObject"}
+                        forProvider.manifest = {
+                            apiVersion = "cert-manager.io/v1"
+                            kind = "ClusterIssuer"
+                            metadata.name = "internal-ca"
+                            spec = {
+                                ca = {secretName = "internal-ca"}
+                            }
                         }
                     }
                 }

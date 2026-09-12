@@ -10,6 +10,7 @@
 {{- $chartDefaults := dict
   "crds" (dict "enabled" true)
   "global" (dict "leaderElection" (dict "namespace" $state.namespace))
+  "extraArgs" (list (printf "--cluster-resource-namespace=%s" $state.namespace))
   "resources" (dict
     "requests" (dict "cpu" "15m" "memory" "100Mi")
     "limits" (dict "cpu" "200m" "memory" "256Mi")

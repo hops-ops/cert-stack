@@ -34,7 +34,7 @@ This composes:
 | `values` | object | — | Helm values merged with chart defaults |
 | `internalCA.enabled` | bool | `false` | Compose a cluster-internal CA and `ClusterIssuer` (`internal-ca`) for in-cluster HTTPS (`*.svc.cluster.local`). Let's Encrypt stays in the DNS stacks. |
 | `internalCA.clusterIssuerName` | string | `internal-ca` | Name leaf Certificates should `issuerRef`. |
-| `internalCA.secretName` | string | same as issuer | CA Secret in the cert-manager namespace (`ca.crt`). |
+| `internalCA.secretName` | string | same as issuer | CA Secret in the cert-manager Helm namespace (`ca.crt`). ClusterIssuer looks up that secret in cert-manager's cluster-resource-namespace; this stack sets `--cluster-resource-namespace` to the same Helm `namespace`. |
 | `overrideAllValues` | object | — | Helm values that replace all defaults |
 | `managementPolicies` | string[] | `["*"]` | Crossplane management policies |
 | `labels` | object | — | Custom labels merged with defaults |

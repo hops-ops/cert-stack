@@ -16,6 +16,8 @@ metadata:
   labels: {{ $state.labels | toJson }}
 spec:
   managementPolicies: {{ $state.managementPolicies | toJson }}
+  readiness:
+    policy: DeriveFromObject
   forProvider:
     manifest:
       apiVersion: cert-manager.io/v1
@@ -38,6 +40,8 @@ metadata:
   labels: {{ $state.labels | toJson }}
 spec:
   managementPolicies: {{ $state.managementPolicies | toJson }}
+  readiness:
+    policy: DeriveFromObject
   forProvider:
     manifest:
       apiVersion: cert-manager.io/v1
@@ -71,6 +75,8 @@ metadata:
   labels: {{ $state.labels | toJson }}
 spec:
   managementPolicies: {{ $state.managementPolicies | toJson }}
+  readiness:
+    policy: DeriveFromObject
   forProvider:
     manifest:
       apiVersion: cert-manager.io/v1
