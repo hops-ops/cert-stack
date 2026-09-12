@@ -8,4 +8,11 @@
 apiVersion: {{ $xr.apiVersion }}
 kind: {{ $xr.kind }}
 status:
-  ready: {{ $state.observed.certManager.ready }}
+  ready: {{ and $state.observed.certManager.ready $state.observed.internalCA.ready }}
+  {{- if $state.internalCA.enabled }}
+  internalCA:
+    enabled: true
+    clusterIssuerName: {{ $state.internalCA.clusterIssuerName | quote }}
+    caSecretName: {{ $state.internalCA.secretName | quote }}
+    caSecretNamespace: {{ $state.namespace | quote }}
+  {{- end }}

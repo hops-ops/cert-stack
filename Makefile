@@ -17,7 +17,8 @@ build:
 
 EXAMPLES := \
     examples/certstacks/minimal.yaml:: \
-    examples/certstacks/standard.yaml::
+    examples/certstacks/standard.yaml:: \
+    examples/certstacks/internal-ca.yaml::
 
 render\:all:
 	@tmpdir=$$(mktemp -d); \

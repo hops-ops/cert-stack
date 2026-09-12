@@ -1,0 +1,87 @@
+# code: language=yaml
+#
+# Optional cluster-internal CA for in-cluster HTTPS (*.svc.cluster.local).
+# Bootstrap ClusterIssuer (selfSigned) -> CA Certificate -> ClusterIssuer.
+# Let's Encrypt issuers stay in the DNS stacks.
+#
+
+{{- if $state.internalCA.enabled }}
+---
+apiVersion: kubernetes.m.crossplane.io/v1alpha1
+kind: Object
+metadata:
+  name: {{ printf "%s-internal-ca-bootstrap" $state.name }}
+  annotations:
+    {{ setResourceNameAnnotation "internal-ca-bootstrap" }}
+  labels: {{ $state.labels | toJson }}
+spec:
+  managementPolicies: {{ $state.managementPolicies | toJson }}
+  forProvider:
+    manifest:
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: {{ $state.internalCA.bootstrapIssuerName }}
+        labels: {{ $state.labels | toJson }}
+      spec:
+        selfSigned: {}
+  providerConfigRef:
+    name: {{ $state.kubernetesProviderConfigRef.name }}
+    kind: {{ $state.kubernetesProviderConfigRef.kind }}
+---
+apiVersion: kubernetes.m.crossplane.io/v1alpha1
+kind: Object
+metadata:
+  name: {{ printf "%s-internal-ca-cert" $state.name }}
+  annotations:
+    {{ setResourceNameAnnotation "internal-ca-cert" }}
+  labels: {{ $state.labels | toJson }}
+spec:
+  managementPolicies: {{ $state.managementPolicies | toJson }}
+  forProvider:
+    manifest:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: {{ $state.internalCA.secretName }}
+        namespace: {{ $state.namespace }}
+        labels: {{ $state.labels | toJson }}
+      spec:
+        isCA: true
+        commonName: {{ $state.internalCA.clusterIssuerName | quote }}
+        secretName: {{ $state.internalCA.secretName }}
+        duration: {{ $state.internalCA.duration | quote }}
+        privateKey:
+          algorithm: ECDSA
+          size: 256
+        issuerRef:
+          name: {{ $state.internalCA.bootstrapIssuerName }}
+          kind: ClusterIssuer
+          group: cert-manager.io
+  providerConfigRef:
+    name: {{ $state.kubernetesProviderConfigRef.name }}
+    kind: {{ $state.kubernetesProviderConfigRef.kind }}
+---
+apiVersion: kubernetes.m.crossplane.io/v1alpha1
+kind: Object
+metadata:
+  name: {{ printf "%s-internal-ca-issuer" $state.name }}
+  annotations:
+    {{ setResourceNameAnnotation "internal-ca-issuer" }}
+  labels: {{ $state.labels | toJson }}
+spec:
+  managementPolicies: {{ $state.managementPolicies | toJson }}
+  forProvider:
+    manifest:
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: {{ $state.internalCA.clusterIssuerName }}
+        labels: {{ $state.labels | toJson }}
+      spec:
+        ca:
+          secretName: {{ $state.internalCA.secretName }}
+  providerConfigRef:
+    name: {{ $state.kubernetesProviderConfigRef.name }}
+    kind: {{ $state.kubernetesProviderConfigRef.kind }}
+{{- end }}

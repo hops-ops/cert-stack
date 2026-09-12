@@ -1,0 +1,13 @@
+apiVersion: hops.ops.com.ai/v1alpha1
+kind: CertStack
+metadata:
+  name: certs
+  namespace: default
+spec:
+  clusterName: production-cluster
+  namespace: cert-manager
+  # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
+  chartVersion: v1.21.2
+  internalCA:
+    enabled: true
+    clusterIssuerName: internal-ca
