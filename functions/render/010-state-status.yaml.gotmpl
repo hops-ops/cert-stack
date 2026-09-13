@@ -15,9 +15,12 @@
   {{- end }}
 {{- end }}
 
-{{- $internalCAReady := true }}
+{{- $caBootstrapReady := false }}
+{{- $caCertReady := false }}
+{{- $caIssuerReady := false }}
 {{- if $state.internalCA.enabled }}
-  {{- range $key := list "internal-ca-bootstrap" "internal-ca-cert" "internal-ca-issuer" }}
+  {{- range $pair := list (list "internal-ca-bootstrap" "bootstrap") (list "internal-ca-cert" "cert") (list "internal-ca-issuer" "issuer") }}
+    {{- $key := index $pair 0 }}
     {{- $entry := get $observed $key | default dict }}
     {{- $resource := $entry.resource | default dict }}
     {{- $status := $resource.status | default dict }}
@@ -27,15 +30,29 @@
         {{- $ready = true }}
       {{- end }}
     {{- end }}
-    {{- if not $ready }}
-      {{- $internalCAReady = false }}
+    {{- if eq $key "internal-ca-bootstrap" }}
+      {{- $caBootstrapReady = $ready }}
+    {{- else if eq $key "internal-ca-cert" }}
+      {{- $caCertReady = $ready }}
+    {{- else }}
+      {{- $caIssuerReady = $ready }}
     {{- end }}
   {{- end }}
+{{- else }}
+  {{- $caBootstrapReady = true }}
+  {{- $caCertReady = true }}
+  {{- $caIssuerReady = true }}
 {{- end }}
+{{- $internalCAReady := and $caBootstrapReady $caCertReady $caIssuerReady }}
 
 {{- $state = set $state "observed" (dict
   "certManager" (dict "ready" $certManagerReady)
-  "internalCA" (dict "ready" $internalCAReady)
+  "internalCA" (dict
+    "ready" $internalCAReady
+    "bootstrapReady" $caBootstrapReady
+    "certReady" $caCertReady
+    "issuerReady" $caIssuerReady
+  )
 ) }}
 
 {{- $state = set $state "status" (dict

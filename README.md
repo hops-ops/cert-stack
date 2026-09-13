@@ -46,6 +46,7 @@ This composes:
 | `<releaseName>` | `helm.m.crossplane.io/Release` |
 | `internal-ca-bootstrap` (if `internalCA.enabled`) | `ClusterIssuer` (selfSigned) |
 | CA `Certificate` + `ClusterIssuer` (if enabled) | cert-manager CA for in-cluster TLS |
+| `Usage`s (if enabled) | Delete CA ClusterIssuer → CA cert → bootstrap → Helm |
 
 ## Dependencies
 
