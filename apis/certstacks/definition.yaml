@@ -65,6 +65,35 @@ spec:
                 description: Helm values that replace all defaults entirely.
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
+              kubernetesProviderConfigRef:
+                description: Reference to the Kubernetes ProviderConfig used for ClusterIssuer and Certificate objects. Defaults to clusterName.
+                type: object
+                properties:
+                  name:
+                    type: string
+                  kind:
+                    type: string
+                    enum:
+                    - ProviderConfig
+                    - ClusterProviderConfig
+              internalCA:
+                description: Optional cluster-internal CA and ClusterIssuer for in-cluster HTTPS (e.g. *.svc.cluster.local). Let's Encrypt issuers stay in the DNS stacks.
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                    default: false
+                  clusterIssuerName:
+                    description: ClusterIssuer name leaf certificates should reference. Defaults to internal-ca.
+                    type: string
+                    default: internal-ca
+                  secretName:
+                    description: Secret in the cert-manager namespace holding the CA. Defaults to clusterIssuerName.
+                    type: string
+                  duration:
+                    description: CA certificate duration. Defaults to 87600h (10 years).
+                    type: string
+                    default: 87600h
             required:
             - clusterName
           status:
@@ -74,5 +103,16 @@ spec:
               ready:
                 description: Whether the cert-manager Helm release is healthy.
                 type: boolean
+              internalCA:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  clusterIssuerName:
+                    type: string
+                  caSecretName:
+                    type: string
+                  caSecretNamespace:
+                    type: string
         required:
         - spec

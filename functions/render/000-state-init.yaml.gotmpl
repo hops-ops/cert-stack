@@ -34,6 +34,20 @@
   "name" ($helmProviderConfigRef.name | default $clusterName)
   "kind" ($helmProviderConfigRef.kind | default "ProviderConfig")
 }}
+{{- $kubernetesProviderConfigRef := $spec.kubernetesProviderConfigRef | default dict }}
+{{- $kubernetesProviderConfigRef = dict
+  "name" ($kubernetesProviderConfigRef.name | default $clusterName)
+  "kind" ($kubernetesProviderConfigRef.kind | default "ProviderConfig")
+}}
+
+{{- $internalCASpec := $spec.internalCA | default dict }}
+{{- $internalCAEnabled := false }}
+{{- if hasKey $internalCASpec "enabled" }}
+  {{- $internalCAEnabled = $internalCASpec.enabled }}
+{{- end }}
+{{- $internalCAIssuerName := $internalCASpec.clusterIssuerName | default "internal-ca" }}
+{{- $internalCASecretName := $internalCASpec.secretName | default $internalCAIssuerName }}
+{{- $internalCADuration := $internalCASpec.duration | default "87600h" }}
 
 # ==============================================================================
 # Initialize $state
@@ -47,6 +61,14 @@
   "managementPolicies" $managementPolicies
   "labels" $labels
   "helmProviderConfigRef" $helmProviderConfigRef
+  "kubernetesProviderConfigRef" $kubernetesProviderConfigRef
+  "internalCA" (dict
+    "enabled" $internalCAEnabled
+    "clusterIssuerName" $internalCAIssuerName
+    "secretName" $internalCASecretName
+    "duration" $internalCADuration
+    "bootstrapIssuerName" (printf "%s-bootstrap" $internalCAIssuerName)
+  )
   "values" ($spec.values | default dict)
   "overrideAllValues" ($spec.overrideAllValues | default dict)
   "observed" (dict)

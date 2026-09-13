@@ -32,6 +32,9 @@ This composes:
 | `helmProviderConfigRef.name` | string | `clusterName` | Helm ProviderConfig |
 | `helmProviderConfigRef.kind` | enum | `ProviderConfig` | `ProviderConfig` or `ClusterProviderConfig` |
 | `values` | object | — | Helm values merged with chart defaults |
+| `internalCA.enabled` | bool | `false` | Compose a cluster-internal CA and `ClusterIssuer` (`internal-ca`) for in-cluster HTTPS (`*.svc.cluster.local`). Let's Encrypt stays in the DNS stacks. |
+| `internalCA.clusterIssuerName` | string | `internal-ca` | Name leaf Certificates should `issuerRef`. |
+| `internalCA.secretName` | string | same as issuer | CA Secret in the cert-manager Helm namespace (`ca.crt`). ClusterIssuer looks up that secret in cert-manager's cluster-resource-namespace; this stack sets `--cluster-resource-namespace` to the same Helm `namespace`. |
 | `overrideAllValues` | object | — | Helm values that replace all defaults |
 | `managementPolicies` | string[] | `["*"]` | Crossplane management policies |
 | `labels` | object | — | Custom labels merged with defaults |
@@ -41,6 +44,9 @@ This composes:
 | Resource | Kind |
 |---|---|
 | `<releaseName>` | `helm.m.crossplane.io/Release` |
+| `internal-ca-bootstrap` (if `internalCA.enabled`) | `ClusterIssuer` (selfSigned) |
+| CA `Certificate` + `ClusterIssuer` (if enabled) | cert-manager CA for in-cluster TLS |
+| `Usage`s (if enabled) | Delete CA ClusterIssuer → CA cert → bootstrap → Helm |
 
 ## Dependencies
 

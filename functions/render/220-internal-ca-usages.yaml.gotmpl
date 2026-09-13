@@ -1,0 +1,101 @@
+# code: language=yaml
+#
+# Deletion order for internal CA:
+# ClusterIssuer (ca) -> CA Certificate -> bootstrap ClusterIssuer -> cert-manager Helm
+#
+
+{{- if $state.internalCA.enabled }}
+{{- $helmName := $state.releaseName }}
+{{- $bootstrapName := printf "%s-internal-ca-bootstrap" $state.name }}
+{{- $certName := printf "%s-internal-ca-cert" $state.name }}
+{{- $issuerName := printf "%s-internal-ca-issuer" $state.name }}
+{{- $objectAPI := "kubernetes.m.crossplane.io/v1alpha1" }}
+{{- $helmAPI := "helm.m.crossplane.io/v1beta1" }}
+
+{{- /* Delete CA ClusterIssuer before CA Certificate/Secret */ -}}
+{{- if and $state.observed.internalCA.issuerReady $state.observed.internalCA.certReady }}
+---
+apiVersion: protection.crossplane.io/v1beta1
+kind: Usage
+metadata:
+  name: {{ printf "%s-delete-ca-issuer-before-ca-cert" $state.name }}
+  annotations:
+    {{ setResourceNameAnnotation "usage-ca-issuer-before-ca-cert" }}
+spec:
+  replayDeletion: true
+  of:
+    apiVersion: {{ $objectAPI }}
+    kind: Object
+    resourceRef:
+      name: {{ $certName }}
+  by:
+    apiVersion: {{ $objectAPI }}
+    kind: Object
+    resourceRef:
+      name: {{ $issuerName }}
+{{- end }}
+
+{{- /* Delete CA Certificate before bootstrap ClusterIssuer */ -}}
+{{- if and $state.observed.internalCA.certReady $state.observed.internalCA.bootstrapReady }}
+---
+apiVersion: protection.crossplane.io/v1beta1
+kind: Usage
+metadata:
+  name: {{ printf "%s-delete-ca-cert-before-bootstrap" $state.name }}
+  annotations:
+    {{ setResourceNameAnnotation "usage-ca-cert-before-bootstrap" }}
+spec:
+  replayDeletion: true
+  of:
+    apiVersion: {{ $objectAPI }}
+    kind: Object
+    resourceRef:
+      name: {{ $bootstrapName }}
+  by:
+    apiVersion: {{ $objectAPI }}
+    kind: Object
+    resourceRef:
+      name: {{ $certName }}
+{{- end }}
+
+{{- /* Delete CA objects before cert-manager Helm (CRDs) */ -}}
+{{- if $state.observed.certManager.ready }}
+{{- range $pair := list
+  (list $bootstrapName "usage-bootstrap-before-helm")
+  (list $certName "usage-ca-cert-before-helm")
+  (list $issuerName "usage-ca-issuer-before-helm")
+}}
+{{- $objName := index $pair 0 }}
+{{- $ann := index $pair 1 }}
+{{- $objReady := false }}
+{{- if eq $objName $bootstrapName }}
+  {{- $objReady = $state.observed.internalCA.bootstrapReady }}
+{{- else if eq $objName $certName }}
+  {{- $objReady = $state.observed.internalCA.certReady }}
+{{- else }}
+  {{- $objReady = $state.observed.internalCA.issuerReady }}
+{{- end }}
+{{- if $objReady }}
+---
+apiVersion: protection.crossplane.io/v1beta1
+kind: Usage
+metadata:
+  name: {{ printf "%s-delete-%s" $state.name $ann }}
+  annotations:
+    {{ setResourceNameAnnotation $ann }}
+spec:
+  replayDeletion: true
+  of:
+    apiVersion: {{ $helmAPI }}
+    kind: Release
+    resourceRef:
+      name: {{ $helmName }}
+  by:
+    apiVersion: {{ $objectAPI }}
+    kind: Object
+    resourceRef:
+      name: {{ $objName }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
